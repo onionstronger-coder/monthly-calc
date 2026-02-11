@@ -3,251 +3,247 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Monthly Finance Dashboard</title>
+<title>Ultimate Finance Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
 
 <style>
-
-/* ===== Base ===== */
-
-* {
-    box-sizing: border-box;
+:root{
+    --primary:#14b8a6;
+    --primary-dark:#0f766e;
+    --bg1:#ccfbf1;
+    --bg2:#e0fdfa;
+    --card:rgba(255,255,255,0.9);
+    --text:#0f172a;
 }
 
-body {
-    margin: 0;
-    font-family: 'Prompt', sans-serif;
-    background: linear-gradient(135deg, #c7f9f1, #e6fffb);
-    min-height: 100vh;
-    display: grid;
-    place-items: center;
+body.dark{
+    --bg1:#0f172a;
+    --bg2:#111827;
+    --card:#1f2937;
+    --text:#f1f5f9;
 }
 
-/* ===== Container ===== */
+*{box-sizing:border-box;}
 
-.container {
-    width: 100%;
-    max-width: 384px; /* 48 x 8px */
-    background: #ffffff;
-    padding: 32px; /* 4 x 8 */
-    border-radius: 20px;
-    box-shadow: 0 24px 60px rgba(0,0,0,0.08);
+body{
+    margin:0;
+    font-family:'Prompt',sans-serif;
+    min-height:100vh;
+    display:grid;
+    place-items:center;
+    background:linear-gradient(135deg,var(--bg1),var(--bg2));
+    transition:0.3s;
+    color:var(--text);
 }
 
-/* ===== Typography ===== */
-
-h2 {
-    text-align: center;
-    margin: 0 0 24px 0; /* 3 x 8 */
-    font-weight: 600;
-    font-size: 20px;
-    color: #0f766e;
+.container{
+    width:100%;
+    max-width:460px;
+    padding:36px 28px;
+    border-radius:28px;
+    background:var(--card);
+    backdrop-filter:blur(14px);
+    box-shadow:0 40px 80px rgba(0,0,0,0.15);
+    animation:fadeIn 0.6s ease;
 }
 
-label {
-    display: block;
-    font-size: 13px;
-    margin-bottom: 4px;
-    color: #374151;
+@keyframes fadeIn{
+    from{opacity:0; transform:translateY(15px);}
+    to{opacity:1; transform:translateY(0);}
 }
 
-/* ===== Inputs ===== */
-
-.input-group {
-    margin-bottom: 16px; /* 2 x 8 */
+.header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
 }
 
-input {
-    width: 100%;
-    padding: 12px;
-    border-radius: 12px;
-    border: 1px solid #e5e7eb;
-    font-size: 14px;
-    transition: 0.2s ease;
+h2{
+    margin:0;
+    font-size:20px;
 }
 
-input:focus {
-    outline: none;
-    border-color: #14b8a6;
-    box-shadow: 0 0 0 3px rgba(20,184,166,0.15);
+.toggle{
+    cursor:pointer;
+    padding:6px 10px;
+    border-radius:999px;
+    background:var(--primary);
+    color:white;
+    font-size:12px;
 }
 
-/* ===== Buttons ===== */
+.input-group{margin-bottom:14px;}
 
-.button-group {
-    display: flex;
-    gap: 12px;
-    margin-top: 8px;
-    margin-bottom: 24px;
+label{
+    font-size:13px;
+    display:block;
+    margin-bottom:4px;
 }
 
-button {
-    flex: 1;
-    padding: 12px;
-    border-radius: 12px;
-    border: none;
-    font-weight: 500;
-    font-size: 14px;
-    cursor: pointer;
-    transition: 0.15s ease;
+input{
+    width:100%;
+    padding:11px;
+    border-radius:10px;
+    border:1px solid #ddd;
+    font-size:14px;
 }
 
-button:active {
-    transform: scale(0.97);
+.button-group{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
 }
 
-.calculate-btn {
-    background: #14b8a6;
-    color: white;
+button{
+    flex:1;
+    padding:12px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:500;
+    transition:0.2s;
 }
 
-.calculate-btn:hover {
-    background: #0f766e;
+.calculate{
+    background:linear-gradient(135deg,var(--primary),var(--primary-dark));
+    color:white;
 }
 
-.reset-btn {
-    background: #f3f4f6;
-    color: #374151;
+.calculate:hover{
+    transform:translateY(-2px);
 }
 
-.reset-btn:hover {
-    background: #e5e7eb;
+.reset{
+    background:#e5e7eb;
 }
 
-/* ===== Summary Card ===== */
-
-.summary-card {
-    display: none;
-    background: #f8fafc;
-    padding: 16px;
-    border-radius: 16px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    line-height: 1.6;
+.summary{
+    margin:15px 0;
+    font-size:14px;
+    text-align:center;
 }
 
-.badge {
-    display: inline-block;
-    padding: 6px 12px;
-    border-radius: 999px;
-    font-size: 12px;
-    font-weight: 600;
-    margin-top: 8px;
+canvas{
+    margin-top:18px;
 }
-
-.badge-positive {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.badge-negative {
-    background: #fee2e2;
-    color: #dc2626;
-}
-
-/* ===== Chart ===== */
-
-canvas {
-    margin-top: 8px;
-}
-
 </style>
 </head>
 
 <body>
 
 <div class="container">
-
-    <h2>Monthly Finance Summary</h2>
-
-    <div class="input-group">
-        <label>รายได้ต่อเดือน</label>
-        <input type="number" id="income">
+    <div class="header">
+        <h2>Finance Dashboard</h2>
+        <div class="toggle" onclick="toggleDark()">Dark</div>
     </div>
 
-    <div class="input-group">
-        <label>ค่าเช่า / บ้าน</label>
-        <input type="number" id="rent">
-    </div>
-
-    <div class="input-group">
-        <label>ค่าอาหาร</label>
-        <input type="number" id="food">
-    </div>
-
-    <div class="input-group">
-        <label>ค่าเดินทาง</label>
-        <input type="number" id="travel">
-    </div>
-
-    <div class="input-group">
-        <label>ค่าใช้จ่ายอื่น ๆ</label>
-        <input type="number" id="other">
-    </div>
+    <div class="input-group"><label>รายได้</label><input type="number" id="income"></div>
+    <div class="input-group"><label>ค่าเช่า</label><input type="number" id="rent"></div>
+    <div class="input-group"><label>อาหาร</label><input type="number" id="food"></div>
+    <div class="input-group"><label>เดินทาง</label><input type="number" id="travel"></div>
+    <div class="input-group"><label>อื่น ๆ</label><input type="number" id="other"></div>
 
     <div class="button-group">
-        <button class="calculate-btn" onclick="calculate()">คำนวณ</button>
-        <button class="reset-btn" onclick="resetForm()">ล้างค่า</button>
+        <button class="calculate" onclick="calculate()">คำนวณ</button>
+        <button class="reset" onclick="resetForm()">ล้างค่า</button>
     </div>
 
-    <div class="summary-card" id="summaryCard">
-        <div id="summaryText"></div>
-    </div>
+    <div class="summary" id="summary"></div>
 
-    <canvas id="myChart"></canvas>
-
+    <canvas id="doughnutChart"></canvas>
+    <canvas id="barChart"></canvas>
 </div>
 
 <script>
-let chart;
+let doughnutChart, barChart;
 
-function calculate() {
-    let income = Number(document.getElementById("income").value) || 0;
-    let rent = Number(document.getElementById("rent").value) || 0;
-    let food = Number(document.getElementById("food").value) || 0;
-    let travel = Number(document.getElementById("travel").value) || 0;
-    let other = Number(document.getElementById("other").value) || 0;
+window.onload = function(){
+    const saved = JSON.parse(localStorage.getItem("financeData"));
+    if(saved){
+        for(let key in saved){
+            document.getElementById(key).value = saved[key];
+        }
+    }
+}
 
-    let totalExpense = rent + food + travel + other;
-    let remaining = income - totalExpense;
+function calculate(){
+    let income = +income.value || 0;
+    let rent = +rent.value || 0;
+    let food = +food.value || 0;
+    let travel = +travel.value || 0;
+    let other = +other.value || 0;
 
-    let badgeClass = remaining >= 0 ? "badge-positive" : "badge-negative";
-    let badgeText = remaining >= 0 ? "เงินคงเหลือ" : "ขาดดุล";
+    if(income===0) return;
 
-    document.getElementById("summaryText").innerHTML =
-        "รายจ่ายรวม: <strong>" + totalExpense.toLocaleString() + "</strong> บาท<br>" +
-        "<span class='badge " + badgeClass + "'>" +
-        badgeText + ": " + remaining.toLocaleString() + " บาท</span>";
+    let total = rent+food+travel+other;
+    let remain = income-total;
 
-    document.getElementById("summaryCard").style.display = "block";
+    localStorage.setItem("financeData", JSON.stringify({income,rent,food,travel,other}));
 
-    if (chart) chart.destroy();
+    summary.innerHTML = 
+        "รายจ่ายรวม: <b>"+total.toLocaleString()+"</b> บาท<br>"+
+        "คงเหลือ: <b>"+remain.toLocaleString()+"</b> บาท";
 
-    const ctx = document.getElementById("myChart");
+    if(doughnutChart) doughnutChart.destroy();
+    if(barChart) barChart.destroy();
 
-    chart = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: ['รายจ่าย', 'เงินคงเหลือ'],
-            datasets: [{
-                data: [totalExpense, Math.max(remaining, 0)],
-                backgroundColor: ['#ef4444', '#14b8a6']
+    doughnutChart = new Chart(doughnutChartCanvas(),{
+        type:'doughnut',
+        data:{
+            labels:['เช่า','อาหาร','เดินทาง','อื่น ๆ','คงเหลือ'],
+            datasets:[{
+                data:[rent,food,travel,other,remain>0?remain:0],
+                backgroundColor:['#ef4444','#f97316','#3b82f6','#a855f7','#14b8a6']
             }]
         },
-        options: {
-            plugins: {
-                legend: { position: 'bottom' }
+        options:{
+            animation:{animateScale:true},
+            plugins:{
+                tooltip:{
+                    callbacks:{
+                        label:(c)=>{
+                            let percent=((c.raw/income)*100).toFixed(1);
+                            return c.label+" "+percent+"%";
+                        }
+                    }
+                }
             }
+        }
+    });
+
+    barChart = new Chart(barChartCanvas(),{
+        type:'bar',
+        data:{
+            labels:['เช่า','อาหาร','เดินทาง','อื่น ๆ'],
+            datasets:[{
+                label:'ค่าใช้จ่าย',
+                data:[rent,food,travel,other],
+                backgroundColor:'#14b8a6'
+            }]
         }
     });
 }
 
-function resetForm() {
-    document.querySelectorAll("input").forEach(input => input.value = "");
-    document.getElementById("summaryCard").style.display = "none";
-    if (chart) chart.destroy();
+function doughnutChartCanvas(){
+    return document.getElementById('doughnutChart');
+}
+function barChartCanvas(){
+    return document.getElementById('barChart');
+}
+
+function resetForm(){
+    document.querySelectorAll("input").forEach(i=>i.value="");
+    summary.innerHTML="";
+    localStorage.removeItem("financeData");
+    if(doughnutChart) doughnutChart.destroy();
+    if(barChart) barChart.destroy();
+}
+
+function toggleDark(){
+    document.body.classList.toggle("dark");
 }
 </script>
 
