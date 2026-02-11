@@ -2,60 +2,70 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
-<title>คำนวณเงินเหลือรายเดือน | วางแผนการเงินง่าย ๆ</title>
-<meta name="description" content="เครื่องมือคำนวณเงินเหลือรายเดือน ช่วยวางแผนรายรับรายจ่าย รู้ทันก่อนเงินหมด">
+<title>คำนวณเงินเหลือรายเดือน</title>
 <style>
-body{font-family:sans-serif;max-width:700px;margin:auto;padding:20px;background:#f9f9f9}
-h1{text-align:center}
-input,button{width:100%;padding:10px;margin:6px 0}
-button{background:#4CAF50;color:white;border:none}
-.result{background:white;padding:15px;margin-top:15px;border-radius:8px}
-.tip{margin-top:10px;color:#444}
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+.container {
+    width: 60%;
+    margin: auto;
+    margin-top: 50px;
+}
+input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+}
+button {
+    width: 100%;
+    padding: 12px;
+    background-color: green;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+button:hover {
+    background-color: darkgreen;
+}
+.result {
+    margin-top: 20px;
+    font-size: 20px;
+    font-weight: bold;
+}
 </style>
 </head>
 <body>
 
+<div class="container">
 <h1>คำนวณเงินเหลือรายเดือน</h1>
 
-<input id="income" type="number" placeholder="รายได้ต่อเดือน (บาท)">
-<input id="rent" type="number" placeholder="ค่าเช่า / ผ่อนบ้าน">
-<input id="food" type="number" placeholder="ค่าอาหาร">
-<input id="travel" type="number" placeholder="ค่าเดินทาง">
-<input id="other" type="number" placeholder="ค่าใช้จ่ายอื่น ๆ">
+<input type="number" id="income" placeholder="รายได้ต่อเดือน (บาท)">
+<input type="number" id="rent" placeholder="ค่าเช่า / ผ่อนบ้าน">
+<input type="number" id="food" placeholder="ค่าอาหาร">
+<input type="number" id="travel" placeholder="ค่าเดินทาง">
+<input type="number" id="other" placeholder="ค่าใช้จ่ายอื่น ๆ">
 
-<button onclick="calc()">คำนวณเงินเหลือ</button>
+<button onclick="calculate()">คำนวณเงินเหลือ</button>
 
 <div class="result" id="result"></div>
-
-<section>
-<h2>ทำไมต้องคำนวณเงินเหลือ?</h2>
-<p>การรู้เงินเหลือจริงในแต่ละเดือนช่วยให้คุณวางแผนการเงินได้ดีขึ้น ลดความเสี่ยงเงินไม่พอใช้ และเริ่มออมเงินได้อย่างมีเป้าหมาย</p>
-</section>
+</div>
 
 <script>
-function calc(){
-  const income = +income.value;
-  const total = +rent.value + +food.value + +travel.value + +other.value;
-  const remain = income - total;
-  let level="",tip="";
+function calculate() {
+    let income = parseFloat(document.getElementById("income").value) || 0;
+    let rent = parseFloat(document.getElementById("rent").value) || 0;
+    let food = parseFloat(document.getElementById("food").value) || 0;
+    let travel = parseFloat(document.getElementById("travel").value) || 0;
+    let other = parseFloat(document.getElementById("other").value) || 0;
 
-  if(remain<0){
-    level="❌ ใช้เกินรายได้";
-    tip="ลองลดค่าใช้จ่ายฟุ่มเฟือย หรือเพิ่มรายได้เสริม";
-  }else if(remain<income*0.2){
-    level="⚠️ เหลือน้อย";
-    tip="ควรตั้งงบประมาณรายจ่ายให้ชัดเจนมากขึ้น";
-  }else{
-    level="✅ บริหารเงินได้ดี";
-    tip="ลองแบ่งเงินเหลือไปออม หรือลงทุนระยะยาว";
-  }
+    let totalExpense = rent + food + travel + other;
+    let remaining = income - totalExpense;
 
-  result.innerHTML = `
-    <p><strong>รายจ่ายรวม:</strong> ${total.toLocaleString()} บาท</p>
-    <p><strong>เงินเหลือ:</strong> ${remain.toLocaleString()} บาท</p>
-    <p>${level}</p>
-    <p class="tip">${tip}</p>
-  `;
+    document.getElementById("result").innerHTML =
+        "เงินคงเหลือ: " + remaining.toLocaleString() + " บาท";
 }
 </script>
 
