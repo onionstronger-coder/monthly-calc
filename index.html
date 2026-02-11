@@ -8,7 +8,7 @@
 <style>
 body {
     font-family: Arial, sans-serif;
-    background-color: #f2f2f2;
+    background: linear-gradient(135deg, #74ebd5, #9face6);
     text-align: center;
     padding: 20px;
 }
@@ -17,29 +17,56 @@ body {
     max-width: 400px;
     margin: auto;
     background: white;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+h2 {
+    margin-bottom: 15px;
 }
 
 input {
     width: 100%;
     padding: 10px;
     margin: 8px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
 }
 
 button {
-    width: 100%;
+    flex: 1;
     padding: 12px;
-    background-color: #28a745;
-    color: white;
     border: none;
+    border-radius: 8px;
+    font-size: 15px;
     cursor: pointer;
-    font-size: 16px;
+    transition: 0.2s;
 }
 
-button:hover {
+.calculate-btn {
+    background-color: #28a745;
+    color: white;
+}
+
+.calculate-btn:hover {
     background-color: #218838;
+}
+
+.clear-btn {
+    background-color: #dc3545;
+    color: white;
+}
+
+.clear-btn:hover {
+    background-color: #c82333;
 }
 
 .result {
@@ -61,7 +88,10 @@ button:hover {
     <input type="number" id="travel" placeholder="ค่าเดินทาง">
     <input type="number" id="other" placeholder="ค่าใช้จ่ายอื่น ๆ">
 
-    <button onclick="calculateMoney()">คำนวณเงินเหลือ</button>
+    <div class="buttons">
+        <button class="calculate-btn" onclick="calculateMoney()">คำนวณ</button>
+        <button class="clear-btn" onclick="clearForm()">ล้าง</button>
+    </div>
 
     <div class="result" id="result"></div>
 </div>
@@ -79,6 +109,15 @@ function calculateMoney() {
 
     document.getElementById("result").innerHTML =
         "เงินคงเหลือ: " + remaining.toLocaleString() + " บาท";
+}
+
+function clearForm() {
+    document.getElementById("income").value = "";
+    document.getElementById("rent").value = "";
+    document.getElementById("food").value = "";
+    document.getElementById("travel").value = "";
+    document.getElementById("other").value = "";
+    document.getElementById("result").innerHTML = "";
 }
 </script>
 
