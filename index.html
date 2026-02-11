@@ -3,73 +3,89 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Money Game - Monthly Dashboard</title>
+<title>Monthly Finance Dashboard</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 body {
     margin: 0;
-    font-family: 'Orbitron', sans-serif;
-    background: radial-gradient(circle at top, #141e30, #000000);
+    font-family: 'Prompt', sans-serif;
+    background: #f4f6f9;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    color: white;
 }
 
 .container {
-    width: 380px;
-    background: rgba(20,20,40,0.95);
-    padding: 25px;
-    border-radius: 20px;
-    border: 2px solid #00f2ff;
-    box-shadow: 0 0 25px #00f2ff;
-    text-align: center;
+    width: 420px;
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
 }
 
 h2 {
-    color: #00f2ff;
-    text-shadow: 0 0 10px #00f2ff;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #1e3a8a;
+}
+
+label {
+    font-size: 14px;
+    color: #555;
 }
 
 input {
-    width: 90%;
-    padding: 8px;
-    margin: 6px 0;
-    border-radius: 10px;
-    border: 2px solid #00f2ff;
-    background: #0f0f1b;
-    color: white;
-    text-align: center;
+    width: 100%;
+    padding: 10px;
+    margin: 6px 0 12px 0;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+}
+
+input:focus {
+    outline: none;
+    border-color: #1e3a8a;
 }
 
 button {
-    width: 95%;
-    padding: 10px;
-    margin-top: 8px;
-    border-radius: 10px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 8px;
     border: none;
-    font-weight: bold;
+    background: #1e3a8a;
+    color: white;
+    font-weight: 600;
     cursor: pointer;
-    background: #00f2ff;
-    color: black;
     transition: 0.2s;
 }
 
 button:hover {
-    transform: translateY(-2px);
+    background: #162d66;
 }
 
-.result {
-    margin-top: 10px;
+.summary {
+    margin-top: 15px;
     font-size: 14px;
+    line-height: 1.6;
+}
+
+.status-positive {
+    color: green;
+    font-weight: 600;
+}
+
+.status-negative {
+    color: red;
+    font-weight: 600;
 }
 
 canvas {
-    margin-top: 15px;
+    margin-top: 20px;
 }
 </style>
 </head>
@@ -77,17 +93,26 @@ canvas {
 <body>
 
 <div class="container">
-    <h2>🎮 MONTHLY STATUS</h2>
+    <h2>Monthly Finance Summary</h2>
 
-    <input type="number" id="income" placeholder="💰 รายได้ต่อเดือน">
-    <input type="number" id="rent" placeholder="🏠 ค่าเช่า / บ้าน">
-    <input type="number" id="food" placeholder="🍜 ค่าอาหาร">
-    <input type="number" id="travel" placeholder="🚗 ค่าเดินทาง">
-    <input type="number" id="other" placeholder="📦 ค่าใช้จ่ายอื่น ๆ">
+    <label>รายได้ต่อเดือน</label>
+    <input type="number" id="income">
 
-    <button onclick="calculate()">CALCULATE</button>
+    <label>ค่าเช่า / บ้าน</label>
+    <input type="number" id="rent">
 
-    <div class="result" id="summary"></div>
+    <label>ค่าอาหาร</label>
+    <input type="number" id="food">
+
+    <label>ค่าเดินทาง</label>
+    <input type="number" id="travel">
+
+    <label>ค่าใช้จ่ายอื่น ๆ</label>
+    <input type="number" id="other">
+
+    <button onclick="calculate()">คำนวณ</button>
+
+    <div class="summary" id="summary"></div>
 
     <canvas id="myChart"></canvas>
 </div>
@@ -105,18 +130,13 @@ function calculate() {
     let totalExpense = rent + food + travel + other;
     let remaining = income - totalExpense;
 
-    let statusText;
-    if (remaining > 0) {
-        statusText = "🟢 เงินเหลือ " + remaining.toLocaleString() + " บาท";
-    } else if (remaining < 0) {
-        statusText = "🔴 ติดลบ " + remaining.toLocaleString() + " บาท";
-    } else {
-        statusText = "⚪ พอดี 0 บาท";
-    }
+    let statusClass = remaining >= 0 ? "status-positive" : "status-negative";
+    let statusText = remaining >= 0 ? "เงินคงเหลือ" : "ขาดดุล";
 
     document.getElementById("summary").innerHTML =
         "รายจ่ายรวม: " + totalExpense.toLocaleString() + " บาท<br>" +
-        statusText;
+        "<span class='" + statusClass + "'>" +
+        statusText + ": " + remaining.toLocaleString() + " บาท</span>";
 
     if (chart) {
         chart.destroy();
@@ -125,19 +145,18 @@ function calculate() {
     const ctx = document.getElementById("myChart");
 
     chart = new Chart(ctx, {
-        type: 'pie',
+        type: 'doughnut',
         data: {
-            labels: ['รายจ่าย', 'เงินเหลือ'],
+            labels: ['รายจ่าย', 'เงินคงเหลือ'],
             datasets: [{
-                data: [totalExpense, Math.max(remaining,0)]
+                data: [totalExpense, Math.max(remaining, 0)],
+                backgroundColor: ['#ef4444', '#22c55e']
             }]
         },
         options: {
             plugins: {
                 legend: {
-                    labels: {
-                        color: 'white'
-                    }
+                    position: 'bottom'
                 }
             }
         }
