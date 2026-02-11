@@ -2,64 +2,77 @@
 <html lang="th">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>คำนวณเงินเหลือรายเดือน</title>
+
 <style>
 body {
     font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    background-color: #f2f2f2;
     text-align: center;
+    padding: 20px;
 }
+
 .container {
-    width: 60%;
+    max-width: 400px;
     margin: auto;
-    margin-top: 50px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
+
 input {
     width: 100%;
     padding: 10px;
-    margin: 10px 0;
+    margin: 8px 0;
 }
+
 button {
     width: 100%;
     padding: 12px;
-    background-color: green;
+    background-color: #28a745;
     color: white;
     border: none;
     cursor: pointer;
+    font-size: 16px;
 }
+
 button:hover {
-    background-color: darkgreen;
+    background-color: #218838;
 }
+
 .result {
-    margin-top: 20px;
-    font-size: 20px;
+    margin-top: 15px;
+    font-size: 18px;
     font-weight: bold;
 }
 </style>
 </head>
+
 <body>
 
 <div class="container">
-<h1>คำนวณเงินเหลือรายเดือน</h1>
+    <h2>คำนวณเงินเหลือรายเดือน</h2>
 
-<input type="number" id="income" placeholder="รายได้ต่อเดือน (บาท)">
-<input type="number" id="rent" placeholder="ค่าเช่า / ผ่อนบ้าน">
-<input type="number" id="food" placeholder="ค่าอาหาร">
-<input type="number" id="travel" placeholder="ค่าเดินทาง">
-<input type="number" id="other" placeholder="ค่าใช้จ่ายอื่น ๆ">
+    <input type="number" id="income" placeholder="รายได้ต่อเดือน">
+    <input type="number" id="rent" placeholder="ค่าเช่า / ผ่อนบ้าน">
+    <input type="number" id="food" placeholder="ค่าอาหาร">
+    <input type="number" id="travel" placeholder="ค่าเดินทาง">
+    <input type="number" id="other" placeholder="ค่าใช้จ่ายอื่น ๆ">
 
-<button onclick="calculate()">คำนวณเงินเหลือ</button>
+    <button onclick="calculateMoney()">คำนวณเงินเหลือ</button>
 
-<div class="result" id="result"></div>
+    <div class="result" id="result"></div>
 </div>
 
 <script>
-function calculate() {
-    let income = parseFloat(document.getElementById("income").value) || 0;
-    let rent = parseFloat(document.getElementById("rent").value) || 0;
-    let food = parseFloat(document.getElementById("food").value) || 0;
-    let travel = parseFloat(document.getElementById("travel").value) || 0;
-    let other = parseFloat(document.getElementById("other").value) || 0;
+function calculateMoney() {
+    let income = Number(document.getElementById("income").value) || 0;
+    let rent = Number(document.getElementById("rent").value) || 0;
+    let food = Number(document.getElementById("food").value) || 0;
+    let travel = Number(document.getElementById("travel").value) || 0;
+    let other = Number(document.getElementById("other").value) || 0;
 
     let totalExpense = rent + food + travel + other;
     let remaining = income - totalExpense;
