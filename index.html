@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ultimate Finance Dashboard</title>
+<title>Finance Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;500;600&display=swap" rel="stylesheet">
@@ -14,7 +14,7 @@
     --primary-dark:#0f766e;
     --bg1:#ccfbf1;
     --bg2:#e0fdfa;
-    --card:rgba(255,255,255,0.9);
+    --card:rgba(255,255,255,0.95);
     --text:#0f172a;
 }
 
@@ -34,8 +34,8 @@ body{
     display:grid;
     place-items:center;
     background:linear-gradient(135deg,var(--bg1),var(--bg2));
-    transition:0.3s;
     color:var(--text);
+    transition:.3s;
 }
 
 .container{
@@ -44,14 +44,7 @@ body{
     padding:36px 28px;
     border-radius:28px;
     background:var(--card);
-    backdrop-filter:blur(14px);
     box-shadow:0 40px 80px rgba(0,0,0,0.15);
-    animation:fadeIn 0.6s ease;
-}
-
-@keyframes fadeIn{
-    from{opacity:0; transform:translateY(15px);}
-    to{opacity:1; transform:translateY(0);}
 }
 
 .header{
@@ -59,11 +52,6 @@ body{
     justify-content:space-between;
     align-items:center;
     margin-bottom:20px;
-}
-
-h2{
-    margin:0;
-    font-size:20px;
 }
 
 .toggle{
@@ -88,7 +76,6 @@ input{
     padding:11px;
     border-radius:10px;
     border:1px solid #ddd;
-    font-size:14px;
 }
 
 .button-group{
@@ -103,17 +90,11 @@ button{
     border:none;
     border-radius:12px;
     cursor:pointer;
-    font-weight:500;
-    transition:0.2s;
 }
 
 .calculate{
     background:linear-gradient(135deg,var(--primary),var(--primary-dark));
     color:white;
-}
-
-.calculate:hover{
-    transform:translateY(-2px);
 }
 
 .reset{
@@ -141,7 +122,7 @@ canvas{
     </div>
 
     <div class="input-group"><label>รายได้</label><input type="number" id="income"></div>
-    <div class="input-group"><label>ค่าเช่า</label><input type="number" id="rent"></div>
+    <div class="input-group"><label>ที่พัก</label><input type="number" id="rent"></div>
     <div class="input-group"><label>อาหาร</label><input type="number" id="food"></div>
     <div class="input-group"><label>เดินทาง</label><input type="number" id="travel"></div>
     <div class="input-group"><label>อื่น ๆ</label><input type="number" id="other"></div>
@@ -160,47 +141,39 @@ canvas{
 <script>
 let doughnutChart, barChart;
 
-window.onload = function(){
-    const saved = JSON.parse(localStorage.getItem("financeData"));
-    if(saved){
-        for(let key in saved){
-            document.getElementById(key).value = saved[key];
-        }
-    }
-}
-
 function calculate(){
-    let income = +income.value || 0;
-    let rent = +rent.value || 0;
-    let food = +food.value || 0;
-    let travel = +travel.value || 0;
-    let other = +other.value || 0;
 
-    if(income===0) return;
+    const income = Number(document.getElementById("income").value) || 0;
+    const rent = Number(document.getElementById("rent").value) || 0;
+    const food = Number(document.getElementById("food").value) || 0;
+    const travel = Number(document.getElementById("travel").value) || 0;
+    const other = Number(document.getElementById("other").value) || 0;
 
-    let total = rent+food+travel+other;
-    let remain = income-total;
+    if(income === 0){
+        alert("กรุณาใส่รายได้ก่อน");
+        return;
+    }
 
-    localStorage.setItem("financeData", JSON.stringify({income,rent,food,travel,other}));
+    const total = rent + food + travel + other;
+    const remain = income - total;
 
-    summary.innerHTML = 
+    document.getElementById("summary").innerHTML =
         "รายจ่ายรวม: <b>"+total.toLocaleString()+"</b> บาท<br>"+
         "คงเหลือ: <b>"+remain.toLocaleString()+"</b> บาท";
 
     if(doughnutChart) doughnutChart.destroy();
     if(barChart) barChart.destroy();
 
-    doughnutChart = new Chart(doughnutChartCanvas(),{
+    doughnutChart = new Chart(document.getElementById("doughnutChart"),{
         type:'doughnut',
         data:{
-            labels:['เช่า','อาหาร','เดินทาง','อื่น ๆ','คงเหลือ'],
+            labels:['ที่พัก','อาหาร','เดินทาง','อื่น ๆ','คงเหลือ'],
             datasets:[{
                 data:[rent,food,travel,other,remain>0?remain:0],
                 backgroundColor:['#ef4444','#f97316','#3b82f6','#a855f7','#14b8a6']
             }]
         },
         options:{
-            animation:{animateScale:true},
             plugins:{
                 tooltip:{
                     callbacks:{
@@ -214,10 +187,10 @@ function calculate(){
         }
     });
 
-    barChart = new Chart(barChartCanvas(),{
+    barChart = new Chart(document.getElementById("barChart"),{
         type:'bar',
         data:{
-            labels:['เช่า','อาหาร','เดินทาง','อื่น ๆ'],
+            labels:['ที่พัก','อาหาร','เดินทาง','อื่น ๆ'],
             datasets:[{
                 label:'ค่าใช้จ่าย',
                 data:[rent,food,travel,other],
@@ -227,17 +200,9 @@ function calculate(){
     });
 }
 
-function doughnutChartCanvas(){
-    return document.getElementById('doughnutChart');
-}
-function barChartCanvas(){
-    return document.getElementById('barChart');
-}
-
 function resetForm(){
     document.querySelectorAll("input").forEach(i=>i.value="");
-    summary.innerHTML="";
-    localStorage.removeItem("financeData");
+    document.getElementById("summary").innerHTML="";
     if(doughnutChart) doughnutChart.destroy();
     if(barChart) barChart.destroy();
 }
