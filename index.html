@@ -52,20 +52,37 @@ input:focus {
     border-color: #1e3a8a;
 }
 
+.button-group {
+    display: flex;
+    gap: 10px;
+}
+
 button {
-    width: 100%;
+    flex: 1;
     padding: 12px;
     border-radius: 8px;
     border: none;
-    background: #1e3a8a;
-    color: white;
     font-weight: 600;
     cursor: pointer;
     transition: 0.2s;
 }
 
-button:hover {
+.calculate-btn {
+    background: #1e3a8a;
+    color: white;
+}
+
+.calculate-btn:hover {
     background: #162d66;
+}
+
+.reset-btn {
+    background: #e5e7eb;
+    color: #333;
+}
+
+.reset-btn:hover {
+    background: #d1d5db;
 }
 
 .summary {
@@ -86,6 +103,55 @@ button:hover {
 
 canvas {
     margin-top: 20px;
+}
+
+/* ===== Modal Animation ===== */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+}
+
+.modal.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    width: 300px;
+    text-align: center;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    transform: translateY(20px);
+    transition: transform 0.3s ease;
+}
+
+.modal.show .modal-content {
+    transform: translateY(0);
+}
+
+.modal-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 10px;
+}
+
+.confirm-btn {
+    background: #dc2626;
+    color: white;
+}
+
+.cancel-btn {
+    background: #e5e7eb;
 }
 </style>
 </head>
@@ -110,15 +176,29 @@ canvas {
     <label>ค่าใช้จ่ายอื่น ๆ</label>
     <input type="number" id="other">
 
-    <button onclick="calculate()">คำนวณ</button>
+    <div class="button-group">
+        <button class="calculate-btn" onclick="calculate()">คำนวณ</button>
+        <button class="reset-btn" onclick="openModal()">ล้างค่า</button>
+    </div>
 
     <div class="summary" id="summary"></div>
-
     <canvas id="myChart"></canvas>
+</div>
+
+<!-- Modal -->
+<div class="modal" id="confirmModal">
+    <div class="modal-content">
+        <p>คุณต้องการล้างข้อมูลทั้งหมดหรือไม่?</p>
+        <div class="modal-buttons">
+            <button class="confirm-btn" onclick="resetForm()">ยืนยัน</button>
+            <button class="cancel-btn" onclick="closeModal()">ยกเลิก</button>
+        </div>
+    </div>
 </div>
 
 <script>
 let chart;
+const modal = document.getElementById("confirmModal");
 
 function calculate() {
     let income = Number(document.getElementById("income").value) || 0;
@@ -138,9 +218,7 @@ function calculate() {
         "<span class='" + statusClass + "'>" +
         statusText + ": " + remaining.toLocaleString() + " บาท</span>";
 
-    if (chart) {
-        chart.destroy();
-    }
+    if (chart) chart.destroy();
 
     const ctx = document.getElementById("myChart");
 
@@ -155,12 +233,25 @@ function calculate() {
         },
         options: {
             plugins: {
-                legend: {
-                    position: 'bottom'
-                }
+                legend: { position: 'bottom' }
             }
         }
     });
+}
+
+function openModal() {
+    modal.classList.add("show");
+}
+
+function closeModal() {
+    modal.classList.remove("show");
+}
+
+function resetForm() {
+    document.querySelectorAll("input").forEach(input => input.value = "");
+    document.getElementById("summary").innerHTML = "";
+    if (chart) chart.destroy();
+    closeModal();
 }
 </script>
 
