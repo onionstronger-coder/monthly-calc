@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>MONEY GAME 3.0</title>
+<title>Money Game - Monthly Dashboard</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 body {
@@ -20,7 +21,7 @@ body {
 }
 
 .container {
-    width: 360px;
+    width: 380px;
     background: rgba(20,20,40,0.95);
     padding: 25px;
     border-radius: 20px;
@@ -47,12 +48,14 @@ input {
 
 button {
     width: 95%;
-    padding: 8px;
-    margin-top: 6px;
+    padding: 10px;
+    margin-top: 8px;
     border-radius: 10px;
     border: none;
     font-weight: bold;
     cursor: pointer;
+    background: #00f2ff;
+    color: black;
     transition: 0.2s;
 }
 
@@ -60,148 +63,86 @@ button:hover {
     transform: translateY(-2px);
 }
 
-.play { background: #00f2ff; color: black; }
-.reset { background: #ff0077; color: white; }
-
-.status {
+.result {
     margin-top: 10px;
     font-size: 14px;
 }
 
-/* HP Bar */
-.bar-container {
-    width: 100%;
-    height: 15px;
-    background: #222;
-    border-radius: 10px;
-    margin-top: 5px;
-    overflow: hidden;
-}
-
-.bar {
-    height: 100%;
-    width: 100%;
-    background: #00ff88;
-    transition: 0.4s;
-}
-
-/* XP */
-.xp-bar {
-    background: linear-gradient(90deg, #00f2ff, #00ffcc);
-}
-
-/* Flash effect */
-.flash {
-    animation: flash 0.5s ease;
-}
-
-@keyframes flash {
-    0% { box-shadow: 0 0 10px white; }
-    50% { box-shadow: 0 0 40px gold; }
-    100% { box-shadow: 0 0 10px white; }
+canvas {
+    margin-top: 15px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="container" id="gameBox">
-    <h2>🎮 MONEY GAME 3.0</h2>
+<div class="container">
+    <h2>🎮 MONTHLY STATUS</h2>
 
-    <input type="text" id="player" placeholder="👤 ชื่อตัวละคร">
-    <input type="number" id="income" placeholder="💰 รายได้">
-    <input type="number" id="expense" placeholder="💸 รายจ่าย">
+    <input type="number" id="income" placeholder="💰 รายได้ต่อเดือน">
+    <input type="number" id="rent" placeholder="🏠 ค่าเช่า / บ้าน">
+    <input type="number" id="food" placeholder="🍜 ค่าอาหาร">
+    <input type="number" id="travel" placeholder="🚗 ค่าเดินทาง">
+    <input type="number" id="other" placeholder="📦 ค่าใช้จ่ายอื่น ๆ">
 
-    <button class="play" onclick="playGame()">PLAY TURN</button>
-    <button class="reset" onclick="resetGame()">RESET</button>
+    <button onclick="calculate()">CALCULATE</button>
 
-    <div class="status" id="info"></div>
+    <div class="result" id="summary"></div>
 
-    <div class="status">❤️ HP</div>
-    <div class="bar-container">
-        <div class="bar" id="hpBar"></div>
-    </div>
-
-    <div class="status">⭐ XP</div>
-    <div class="bar-container">
-        <div class="bar xp-bar" id="xpBar"></div>
-    </div>
-
-    <div class="status" id="level"></div>
-    <div class="status" id="achievement"></div>
+    <canvas id="myChart"></canvas>
 </div>
 
 <script>
-let hp = 100;
-let xp = 0;
-let level = 1;
-let coins = 0;
+let chart;
 
-function playGame() {
-    let name = document.getElementById("player").value || "Player";
-    let income = parseFloat(document.getElementById("income").value) || 0;
-    let expense = parseFloat(document.getElementById("expense").value) || 0;
-    let total = income - expense;
+function calculate() {
+    let income = Number(document.getElementById("income").value) || 0;
+    let rent = Number(document.getElementById("rent").value) || 0;
+    let food = Number(document.getElementById("food").value) || 0;
+    let travel = Number(document.getElementById("travel").value) || 0;
+    let other = Number(document.getElementById("other").value) || 0;
 
-    if (total > 0) {
-        let gain = Math.floor(total / 1000);
-        xp += gain;
-        coins += gain;
-        document.getElementById("info").innerHTML =
-            "🟢 " + name + " ได้รับ +" + gain + " XP และเหรียญ";
-    } else if (total < 0) {
-        hp -= 10;
-        document.getElementById("info").innerHTML =
-            "🔴 ขาดทุน! HP ลดลง 10";
+    let totalExpense = rent + food + travel + other;
+    let remaining = income - totalExpense;
+
+    let statusText;
+    if (remaining > 0) {
+        statusText = "🟢 เงินเหลือ " + remaining.toLocaleString() + " บาท";
+    } else if (remaining < 0) {
+        statusText = "🔴 ติดลบ " + remaining.toLocaleString() + " บาท";
     } else {
-        document.getElementById("info").innerHTML =
-            "⚪ เท่าทุน ไม่มีอะไรเกิดขึ้น";
+        statusText = "⚪ พอดี 0 บาท";
     }
 
-    if (xp >= level * 20) {
-        level++;
-        document.getElementById("gameBox").classList.add("flash");
-        setTimeout(() => {
-            document.getElementById("gameBox").classList.remove("flash");
-        }, 500);
+    document.getElementById("summary").innerHTML =
+        "รายจ่ายรวม: " + totalExpense.toLocaleString() + " บาท<br>" +
+        statusText;
+
+    if (chart) {
+        chart.destroy();
     }
 
-    updateUI();
+    const ctx = document.getElementById("myChart");
+
+    chart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['รายจ่าย', 'เงินเหลือ'],
+            datasets: [{
+                data: [totalExpense, Math.max(remaining,0)]
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    labels: {
+                        color: 'white'
+                    }
+                }
+            }
+        }
+    });
 }
-
-function updateUI() {
-    document.getElementById("hpBar").style.width = hp + "%";
-    document.getElementById("xpBar").style.width = (xp % (level*20)) * 5 + "%";
-    document.getElementById("level").innerHTML =
-        "🏆 Level: " + level + " | 🪙 Coins: " + coins;
-
-    if (coins >= 20) {
-        document.getElementById("achievement").innerHTML =
-            "🎉 Achievement: Smart Saver!";
-    } else {
-        document.getElementById("achievement").innerHTML = "";
-    }
-
-    if (hp <= 0) {
-        document.getElementById("info").innerHTML =
-            "💀 GAME OVER - เงินพัง!";
-    }
-}
-
-function resetGame() {
-    hp = 100;
-    xp = 0;
-    level = 1;
-    coins = 0;
-    document.getElementById("player").value = "";
-    document.getElementById("income").value = "";
-    document.getElementById("expense").value = "";
-    document.getElementById("info").innerHTML = "";
-    document.getElementById("achievement").innerHTML = "";
-    updateUI();
-}
-
-updateUI();
 </script>
 
 </body>
