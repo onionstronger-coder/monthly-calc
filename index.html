@@ -6,13 +6,15 @@
 <title>Monthly Finance Dashboard</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+
 <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 body {
     margin: 0;
     font-family: 'Prompt', sans-serif;
-    background: #f4f6f9;
+    background: linear-gradient(135deg, #c7f9f1, #e6fffb);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -20,17 +22,24 @@ body {
 }
 
 .container {
-    width: 420px;
+    width: 95%;
+    max-width: 420px;
     background: #ffffff;
     padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    border-radius: 20px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.08);
+    animation: fadeIn 0.6s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(15px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 h2 {
     text-align: center;
     margin-bottom: 20px;
-    color: #1e3a8a;
+    color: #0f766e;
 }
 
 label {
@@ -40,16 +49,18 @@ label {
 
 input {
     width: 100%;
-    padding: 10px;
-    margin: 6px 0 12px 0;
-    border-radius: 8px;
-    border: 1px solid #ccc;
+    padding: 12px;
+    margin: 6px 0 14px 0;
+    border-radius: 10px;
+    border: 1px solid #d1d5db;
     font-size: 14px;
+    transition: 0.2s;
 }
 
 input:focus {
     outline: none;
-    border-color: #1e3a8a;
+    border-color: #14b8a6;
+    box-shadow: 0 0 0 3px rgba(20,184,166,0.2);
 }
 
 .button-group {
@@ -60,7 +71,7 @@ input:focus {
 button {
     flex: 1;
     padding: 12px;
-    border-radius: 8px;
+    border-radius: 10px;
     border: none;
     font-weight: 600;
     cursor: pointer;
@@ -68,17 +79,16 @@ button {
 }
 
 .calculate-btn {
-    background: #1e3a8a;
+    background: #14b8a6;
     color: white;
 }
 
 .calculate-btn:hover {
-    background: #162d66;
+    background: #0f766e;
 }
 
 .reset-btn {
     background: #e5e7eb;
-    color: #333;
 }
 
 .reset-btn:hover {
@@ -89,69 +99,21 @@ button {
     margin-top: 15px;
     font-size: 14px;
     line-height: 1.6;
+    animation: fadeIn 0.5s ease;
 }
 
 .status-positive {
-    color: green;
+    color: #16a34a;
     font-weight: 600;
 }
 
 .status-negative {
-    color: red;
+    color: #dc2626;
     font-weight: 600;
 }
 
 canvas {
     margin-top: 20px;
-}
-
-/* ===== Modal Animation ===== */
-
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.4);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity 0.3s ease;
-}
-
-.modal.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.modal-content {
-    background: white;
-    padding: 25px;
-    border-radius: 12px;
-    width: 300px;
-    text-align: center;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    transform: translateY(20px);
-    transition: transform 0.3s ease;
-}
-
-.modal.show .modal-content {
-    transform: translateY(0);
-}
-
-.modal-buttons {
-    margin-top: 20px;
-    display: flex;
-    gap: 10px;
-}
-
-.confirm-btn {
-    background: #dc2626;
-    color: white;
-}
-
-.cancel-btn {
-    background: #e5e7eb;
 }
 </style>
 </head>
@@ -178,27 +140,40 @@ canvas {
 
     <div class="button-group">
         <button class="calculate-btn" onclick="calculate()">คำนวณ</button>
-        <button class="reset-btn" onclick="openModal()">ล้างค่า</button>
+        <button class="reset-btn" onclick="resetForm()">ล้างค่า</button>
     </div>
 
     <div class="summary" id="summary"></div>
     <canvas id="myChart"></canvas>
 </div>
 
-<!-- Modal -->
-<div class="modal" id="confirmModal">
-    <div class="modal-content">
-        <p>คุณต้องการล้างข้อมูลทั้งหมดหรือไม่?</p>
-        <div class="modal-buttons">
-            <button class="confirm-btn" onclick="resetForm()">ยืนยัน</button>
-            <button class="cancel-btn" onclick="closeModal()">ยกเลิก</button>
-        </div>
-    </div>
-</div>
-
 <script>
 let chart;
-const modal = document.getElementById("confirmModal");
+
+Chart.register(ChartDataLabels);
+
+const centerTextPlugin = {
+    id: 'centerText',
+    beforeDraw(chart) {
+        const { width } = chart;
+        const { height } = chart;
+        const ctx = chart.ctx;
+        ctx.restore();
+
+        const remaining = chart.config.data.datasets[0].data[1];
+
+        ctx.font = "600 18px Prompt";
+        ctx.fillStyle = "#0f766e";
+        ctx.textBaseline = "middle";
+
+        const text = remaining.toLocaleString() + " ฿";
+        const textX = Math.round((width - ctx.measureText(text).width) / 2);
+        const textY = height / 2;
+
+        ctx.fillText(text, textX, textY);
+        ctx.save();
+    }
+};
 
 function calculate() {
     let income = Number(document.getElementById("income").value) || 0;
@@ -228,30 +203,36 @@ function calculate() {
             labels: ['รายจ่าย', 'เงินคงเหลือ'],
             datasets: [{
                 data: [totalExpense, Math.max(remaining, 0)],
-                backgroundColor: ['#ef4444', '#22c55e']
+                backgroundColor: ['#ef4444', '#14b8a6']
             }]
         },
         options: {
+            responsive: true,
             plugins: {
-                legend: { position: 'bottom' }
+                legend: { position: 'bottom' },
+                datalabels: {
+                    color: '#fff',
+                    font: { weight: 'bold' },
+                    formatter: (value, context) => {
+                        const total = context.chart.data.datasets[0].data.reduce((a,b)=>a+b,0);
+                        const percentage = ((value / total) * 100).toFixed(1) + "%";
+                        return percentage;
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
             }
-        }
+        },
+        plugins: [centerTextPlugin]
     });
-}
-
-function openModal() {
-    modal.classList.add("show");
-}
-
-function closeModal() {
-    modal.classList.remove("show");
 }
 
 function resetForm() {
     document.querySelectorAll("input").forEach(input => input.value = "");
     document.getElementById("summary").innerHTML = "";
     if (chart) chart.destroy();
-    closeModal();
 }
 </script>
 
