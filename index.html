@@ -6,33 +6,49 @@
 <title>คำนวณเงินเหลือรายเดือน</title>
 
 <style>
+* {
+    box-sizing: border-box;
+}
+
 body {
     font-family: Arial, sans-serif;
     background: linear-gradient(135deg, #74ebd5, #9face6);
-    text-align: center;
-    padding: 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
 }
 
 .container {
-    max-width: 400px;
-    margin: auto;
+    width: 90%;
+    max-width: 420px;
     background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    animation: fadeIn 0.6s ease-in-out;
 }
 
 h2 {
-    margin-bottom: 15px;
+    text-align: center;
+    margin-bottom: 20px;
 }
 
 input {
     width: 100%;
-    padding: 10px;
+    padding: 12px;
     margin: 8px 0;
-    border-radius: 8px;
+    border-radius: 10px;
     border: 1px solid #ccc;
-    font-size: 14px;
+    font-size: 15px;
+    transition: 0.2s;
+}
+
+input:focus {
+    border-color: #74ebd5;
+    outline: none;
+    box-shadow: 0 0 5px rgba(116,235,213,0.6);
 }
 
 .buttons {
@@ -45,7 +61,7 @@ button {
     flex: 1;
     padding: 12px;
     border: none;
-    border-radius: 8px;
+    border-radius: 10px;
     font-size: 15px;
     cursor: pointer;
     transition: 0.2s;
@@ -70,9 +86,30 @@ button {
 }
 
 .result {
-    margin-top: 15px;
-    font-size: 18px;
+    margin-top: 18px;
+    font-size: 20px;
     font-weight: bold;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.positive {
+    color: #28a745;
+}
+
+.negative {
+    color: #dc3545;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 </style>
 </head>
@@ -80,7 +117,7 @@ button {
 <body>
 
 <div class="container">
-    <h2>คำนวณเงินเหลือรายเดือน</h2>
+    <h2>💰 คำนวณเงินเหลือรายเดือน</h2>
 
     <input type="number" id="income" placeholder="รายได้ต่อเดือน">
     <input type="number" id="rent" placeholder="ค่าเช่า / ผ่อนบ้าน">
@@ -107,8 +144,15 @@ function calculateMoney() {
     let totalExpense = rent + food + travel + other;
     let remaining = income - totalExpense;
 
-    document.getElementById("result").innerHTML =
-        "เงินคงเหลือ: " + remaining.toLocaleString() + " บาท";
+    let resultDiv = document.getElementById("result");
+
+    if (remaining >= 0) {
+        resultDiv.className = "result positive";
+        resultDiv.innerHTML = "เงินคงเหลือ: " + remaining.toLocaleString() + " บาท";
+    } else {
+        resultDiv.className = "result negative";
+        resultDiv.innerHTML = "เงินติดลบ: " + remaining.toLocaleString() + " บาท";
+    }
 }
 
 function clearForm() {
